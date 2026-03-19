@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid(2))
+  name      String
+  lastName  String?  @map("last_name")
+  username  String   @unique
+  email     String   @unique
+  password  String
+  birthDate DateTime @map("birth_date")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  comments Comment[]
+
+  @@map("users")
+}
+
+model Writer {
+  id        String   @id @default(cuid(2))
+  name      String
+  lastName  String?  @map("last_name")
+  username  String   @unique
+  email     String   @unique
+  password  String
+  birthDate DateTime @map("birth_date")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  posts Post[]
+
+  @@map("writers")
+}
+
+model Post {
+  id        String   @id @default(cuid(2))
+  title     String
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  writerId String @map("writer_id")
+  writer   Writer @relation(fields: [writerId], references: [id], onDelete: Cascade)
+
+  comments Comment[]
+
+  @@map("posts")
+}
+
+model Comment {
+  id        String   @id @default(cuid(2))
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  postId String @map("post_id")
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
