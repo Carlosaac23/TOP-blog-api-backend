@@ -1,18 +1,20 @@
 import { configDotenv } from 'dotenv';
 configDotenv({ path: '.env.local' });
 
-import type { Request, Response } from 'express';
-
 import express from 'express';
+
+import { publicRoutes } from './routes/publicRoute.js';
+import { userRoutes } from './routes/userRoute.js';
+import { writerRoutes } from './routes/writerRoute.js';
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/api/', (req: Request, res: Response) => {
-  res.send('Hello, World!');
-});
+app.use('/api/', publicRoutes);
+app.use('/api/users/', userRoutes);
+app.use('/api/writers/', writerRoutes);
 
 app.listen(process.env.PORT, error => {
   if (error) {
