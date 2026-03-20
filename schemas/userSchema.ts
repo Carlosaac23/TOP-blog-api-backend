@@ -1,6 +1,6 @@
 import z from 'zod';
 
-export const UserCreateSchema = z.object({
+export const CreateUserSchema = z.object({
   name: z.string().min(2, 'Name is required'),
   lastName: z.string().nullable(),
   username: z.string().min(6, 'Username must be at least 6 characters long'),
@@ -9,7 +9,7 @@ export const UserCreateSchema = z.object({
   birthDate: z.coerce.date(),
 });
 
-export const UserSchema = UserCreateSchema.extend({
+export const UserSchema = CreateUserSchema.extend({
   id: z.cuid2(),
   createdAt: z.date(),
   updatedAt: z.date(),

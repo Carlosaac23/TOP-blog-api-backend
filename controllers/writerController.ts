@@ -4,11 +4,11 @@ import type { Writer } from '../schemas/writerSchema.js';
 
 import { generateHashedPassword } from '../helpers/password.js';
 import { prisma } from '../lib/prisma.js';
-import { WriterCreateSchema } from '../schemas/writerSchema.js';
+import { CreateWriterSchema } from '../schemas/writerSchema.js';
 
 export async function createWriter(req: Request, res: Response) {
   try {
-    const result = WriterCreateSchema.safeParse(req.body);
+    const result = CreateWriterSchema.safeParse(req.body);
 
     if (!result.success) {
       return res.status(400).json({ errors: result.error.issues });
@@ -37,7 +37,7 @@ export async function createWriter(req: Request, res: Response) {
 export async function updateWriter(req: Request, res: Response) {
   try {
     const { writerId } = req.params;
-    const result = WriterCreateSchema.safeParse(req.body);
+    const result = CreateWriterSchema.safeParse(req.body);
     const writer: Writer | null = await prisma.writer.findUnique({
       where: { id: writerId as string },
     });

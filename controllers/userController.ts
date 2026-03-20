@@ -4,11 +4,11 @@ import type { User } from '../schemas/userSchema.js';
 
 import { generateHashedPassword } from '../helpers/password.js';
 import { prisma } from '../lib/prisma.js';
-import { UserCreateSchema } from '../schemas/userSchema.js';
+import { CreateUserSchema } from '../schemas/userSchema.js';
 
 export async function createUser(req: Request, res: Response) {
   try {
-    const result = UserCreateSchema.safeParse(req.body);
+    const result = CreateUserSchema.safeParse(req.body);
 
     if (!result.success) {
       return res.status(400).json({ errors: result.error.issues });
@@ -37,7 +37,7 @@ export async function createUser(req: Request, res: Response) {
 export async function updateUser(req: Request, res: Response) {
   try {
     const { userId } = req.params;
-    const result = UserCreateSchema.safeParse(req.body);
+    const result = CreateUserSchema.safeParse(req.body);
     const user: User | null = await prisma.user.findUnique({ where: { id: userId as string } });
 
     if (!result.success) {
