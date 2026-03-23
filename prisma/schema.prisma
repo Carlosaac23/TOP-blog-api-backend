@@ -19,6 +19,7 @@ model User {
   username  String   @unique
   email     String   @unique
   password  String
+  role      String
   birthDate DateTime @map("birth_date")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -35,6 +36,7 @@ model Writer {
   username  String   @unique
   email     String   @unique
   password  String
+  role      String
   birthDate DateTime @map("birth_date")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
