@@ -1,4 +1,4 @@
-type AuthRole = 'user' | 'writer';
+export type AuthRole = 'user' | 'writer';
 
 export interface AuthJwtPayload {
   sub: string;
@@ -7,4 +7,10 @@ export interface AuthJwtPayload {
   exp?: number;
 }
 
-export type AuthUser = { id: string; role: 'user' | 'writer' };
+export type AuthUser = { id: string; role: AuthRole };
+
+declare global {
+  namespace Express {
+    interface User extends AuthJwtPayload {}
+  }
+}
