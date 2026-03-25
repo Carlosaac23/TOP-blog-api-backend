@@ -1,10 +1,16 @@
 import type { Response, Request } from 'express';
 
-import type { User } from '../schemas/userSchema.js';
+import type { User } from '@/schemas/userSchema.js';
+import type { AuthUser } from '@/types/index.js';
 
-import { generateHashedPassword } from '../helpers/password.js';
-import { prisma } from '../lib/prisma.js';
-import { CreateUserSchema } from '../schemas/userSchema.js';
+import { generateHashedPassword } from '@/helpers/password.js';
+import { prisma } from '@/lib/prisma.js';
+import { CreateUserSchema, UpdateUserSchema } from '@/schemas/userSchema.js';
+
+export async function getUsers(req: Request, res: Response) {
+  const users = await prisma.user.findMany();
+  res.json({ users });
+}
 
 export async function createUser(req: Request, res: Response) {
   try {
@@ -37,8 +43,17 @@ export async function createUser(req: Request, res: Response) {
 export async function updateUser(req: Request, res: Response) {
   try {
     const { userId } = req.params;
-    const result = CreateUserSchema.safeParse(req.body);
+    const result = UpdateUserSchema.safeParse(req.body);
     const user: User | null = await prisma.user.findUnique({ where: { id: userId as string } });
+    const authUser = req.user as AuthUser | undefined;
+
+    if (!authUser) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    if (authUser.role !== 'user' || authUser.id !== userId) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
 
     if (!result.success) {
       return res.status(400).json({ errors: result.error.issues });
@@ -48,12 +63,20 @@ export async function updateUser(req: Request, res: Response) {
       return res.status(401).json({ message: 'User does not exist' });
     }
 
+    const cleanData = Object.fromEntries(
+      Object.entries(result.data).filter(([, value]) => value !== undefined)
+    );
+
+    if (typeof cleanData['password'] === 'string') {
+      cleanData['password'] = await generateHashedPassword(cleanData['password']);
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: userId as string },
-      data: result.data,
+      data: cleanData,
     });
 
-    const { password: _hashedPassword, ...safeUser } = updatedUser;
+    const { password: _hashedPassword, role: _role, ...safeUser } = updatedUser;
 
     res.json({ message: 'User successfully updated', safeUser });
   } catch (error) {
