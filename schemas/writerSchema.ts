@@ -6,8 +6,11 @@ export const CreateWriterSchema = z.object({
   username: z.string().min(6, 'Username must be at least 6 characters long'),
   email: z.email(),
   password: z.string().min(8, 'Password must be at leats 8 characters long'),
+  role: z.string(),
   birthDate: z.coerce.date(),
 });
+
+export const UpdateWriterSchema = CreateWriterSchema.partial().omit({ role: true });
 
 export const WriterSchema = CreateWriterSchema.extend({
   id: z.cuid2(),
