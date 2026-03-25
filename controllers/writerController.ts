@@ -1,10 +1,10 @@
 import type { Response, Request } from 'express';
 
-import type { Writer } from '../schemas/writerSchema.js';
+import type { Writer } from '@/schemas/writerSchema.js';
 
-import { generateHashedPassword } from '../helpers/password.js';
-import { prisma } from '../lib/prisma.js';
-import { CreateWriterSchema } from '../schemas/writerSchema.js';
+import { generateHashedPassword } from '@/helpers/password.js';
+import { prisma } from '@/lib/prisma.js';
+import { CreateWriterSchema } from '@/schemas/writerSchema.js';
 
 export async function createWriter(req: Request, res: Response) {
   try {

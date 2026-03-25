@@ -7,7 +7,7 @@ import { generateHashedPassword } from '@/helpers/password.js';
 import { prisma } from '@/lib/prisma.js';
 import { CreateUserSchema, UpdateUserSchema } from '@/schemas/userSchema.js';
 
-export async function getUsers(req: Request, res: Response) {
+export async function getUsers(_req: Request, res: Response) {
   const users = await prisma.user.findMany();
   res.json({ users });
 }
