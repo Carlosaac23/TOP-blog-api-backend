@@ -2,6 +2,8 @@ import type { Request, Response } from 'express';
 
 import jwt, { type SignOptions } from 'jsonwebtoken';
 
+import type { AuthRole } from '@/types/index.js';
+
 import { validateHashedPassword } from '@/helpers/password.js';
 import { prisma } from '@/lib/prisma.js';
 import { LoginSchema } from '@/schemas/authSchema.js';
@@ -14,25 +16,30 @@ export async function login(req: Request, res: Response) {
       return res.status(400).json({ errors: result.error.issues });
     }
 
-    const { role, identifier, password } = result.data;
+    const { identifier, password } = result.data;
 
-    const account =
-      role === 'user'
-        ? await prisma.user.findFirst({
-            where: { OR: [{ email: identifier }, { username: identifier }] },
-          })
-        : await prisma.writer.findFirst({
-            where: { OR: [{ email: identifier }, { username: identifier }] },
-          });
+    const [user, writer] = await Promise.all([
+      prisma.user.findFirst({ where: { OR: [{ email: identifier }, { username: identifier }] } }),
+      prisma.writer.findFirst({ where: { OR: [{ email: identifier }, { username: identifier }] } }),
+    ]);
 
-    if (!account) {
+    const userPasswordOk = user ? await validateHashedPassword(password, user.password) : false;
+    const writerPasswordOk = writer
+      ? await validateHashedPassword(password, writer.password)
+      : false;
+
+    if (!userPasswordOk && !writerPasswordOk) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const validPassword = await validateHashedPassword(password, account.password);
-    if (!validPassword) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+    if (userPasswordOk && writerPasswordOk) {
+      return res.status(409).json({
+        message: 'Ambiguous account: same identifier/password exists for user and writer',
+      });
     }
+
+    const account = userPasswordOk ? user : writer;
+    const role: AuthRole = userPasswordOk ? 'user' : 'writer';
 
     if (!process.env['JWT_SECRET']) {
       return res.status(500).json({ message: 'JWT_SECRET is not configured' });
@@ -42,7 +49,7 @@ export async function login(req: Request, res: Response) {
     const expiresIn: SignOptions['expiresIn'] =
       (process.env['JWT_EXPIRES_IN'] as SignOptions['expiresIn']) ?? '1h';
 
-    const token = jwt.sign({ sub: account.id, role }, jwtSecret, {
+    const token = jwt.sign({ sub: account?.id, role }, jwtSecret, {
       expiresIn,
     });
 
