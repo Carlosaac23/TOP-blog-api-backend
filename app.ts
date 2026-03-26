@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 
 app.use('/api', publicRoutes);
-app.use('/api/login', authRoutes);
+app.use('/api', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/writers', writerRoutes);
 app.use('/api/posts', postRoutes);
