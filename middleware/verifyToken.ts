@@ -10,7 +10,6 @@ import type { AuthRole } from '@/types/index.js';
 export default function verifyToken(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
   const token = authHeader?.split(' ')[1];
-  console.log('Token:', token);
 
   if (!token) {
     return res.status(401).json({ message: 'No token provided' });
