@@ -7,9 +7,26 @@ import { generateHashedPassword } from '@/helpers/password.js';
 import { prisma } from '@/lib/prisma.js';
 import { CreateUserSchema, UpdateUserSchema } from '@/schemas/userSchema.js';
 
+export async function getUser(req: Request, res: Response) {
+  try {
+    const { user } = req;
+
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ message: error.message });
+    }
+    res.status(500).json({ message: 'Unknown error ocurred' });
+  }
+}
+
 export async function getUsers(_req: Request, res: Response) {
   const users = await prisma.user.findMany();
-  res.json({ users });
+  res.json(users);
 }
 
 export async function createUser(req: Request, res: Response) {
