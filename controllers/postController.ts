@@ -18,14 +18,14 @@ export async function createPost(req: Request, res: Response) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const post = await prisma.post.create({
+    await prisma.post.create({
       data: {
         ...newPost.data,
         writerId,
       },
     });
 
-    res.json(post);
+    res.json({ message: 'Post created successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -94,12 +94,12 @@ export async function updatePost(req: Request, res: Response) {
       Object.entries(newPost.data).filter(([, value]) => value !== undefined)
     );
 
-    const updatedPost = await prisma.post.update({
+    await prisma.post.update({
       where: { id: postId as string },
       data: cleanData,
     });
 
-    res.json({ message: 'Post successfully updated', updatedPost });
+    res.json({ message: 'Post updated successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -119,7 +119,7 @@ export async function deletePost(req: Request, res: Response) {
 
     await prisma.post.delete({ where: { id: postId as string } });
 
-    res.json({ message: 'Post succesfully deleted' });
+    res.json({ message: 'Post deleted successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
