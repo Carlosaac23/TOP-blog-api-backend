@@ -1,21 +1,30 @@
 import z from 'zod';
 
 export const CreateUserSchema = z.object({
-  name: z.string().min(2, 'Name is required'),
-  lastName: z.string().nullable(),
-  username: z.string().min(6, 'Username must be at least 6 characters long'),
+  firstName: z.string().trim().min(1).max(50),
+  lastName: z.string().trim().max(50).optional(),
+  username: z
+    .string()
+    .trim()
+    .min(6)
+    .max(20)
+    .regex(/^[a-zA-Z0-9_]+$/),
   email: z.email(),
-  password: z.string().min(8, 'Password must be at leats 8 characters long'),
-  role: z.string(),
-  birthDate: z.coerce.date(),
+  password: z.string().min(12).regex(/[A-Z]/).regex(/[a-z]/).regex(/[0-9]/),
+  bio: z.string().trim().min(1).max(150),
+  birthDate: z.string().refine(date => {
+    const parsedDate = new Date(date);
+    return !isNaN(parsedDate.getTime());
+  }),
+  role: z.enum(['user', 'writer']),
 });
 
 export const UpdateUserSchema = CreateUserSchema.partial().omit({ role: true });
 
 export const UserSchema = CreateUserSchema.extend({
   id: z.cuid2(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 export type User = z.infer<typeof UserSchema>;

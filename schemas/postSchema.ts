@@ -1,8 +1,8 @@
 import z from 'zod';
 
 export const CreatePostSchema = z.object({
-  title: z.string(),
-  content: z.string(),
+  title: z.string().trim().min(5).max(120),
+  content: z.string().trim().min(20).max(10000),
 });
 
 export const UpdatePostSchema = CreatePostSchema.partial();
