@@ -7,7 +7,6 @@ import express from 'express';
 import passport from '@/config/passport.js';
 import { authRoutes } from '@/routes/authRoute.js';
 import { postRoutes } from '@/routes/postRoute.js';
-import { publicRoutes } from '@/routes/publicRoute.js';
 import { userRoutes } from '@/routes/userRoute.js';
 import { writerRoutes } from '@/routes/writerRoute.js';
 
@@ -18,7 +17,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 
-app.use('/api', publicRoutes);
 app.use('/api', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/writers', writerRoutes);
