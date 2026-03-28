@@ -49,9 +49,20 @@ export async function login(req: Request, res: Response) {
     const expiresIn: SignOptions['expiresIn'] =
       (process.env['JWT_EXPIRES_IN'] as SignOptions['expiresIn']) ?? '1h';
 
-    const token = jwt.sign({ sub: account?.id, role }, jwtSecret, {
-      expiresIn,
-    });
+    const token = jwt.sign(
+      {
+        sub: account?.id,
+        name: `${account?.firstName} ${account?.lastName}`,
+        username: account?.username,
+        email: account?.email,
+        createdAt: account?.createdAt,
+        role,
+      },
+      jwtSecret,
+      {
+        expiresIn,
+      }
+    );
 
     return res.json({ token });
   } catch (error) {
