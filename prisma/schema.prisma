@@ -14,11 +14,12 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid(2))
-  firstName String
+  firstName String   @map("first_name")
   lastName  String?  @map("last_name")
   username  String   @unique
   email     String   @unique
   password  String
+  bio       String
   role      String
   birthDate DateTime @map("birth_date")
   createdAt DateTime @default(now()) @map("created_at")
@@ -31,11 +32,12 @@ model User {
 
 model Writer {
   id        String   @id @default(cuid(2))
-  firstName String
+  firstName String   @map("first_name")
   lastName  String?  @map("last_name")
   username  String   @unique
   email     String   @unique
   password  String
+  bio       String
   role      String
   birthDate DateTime @map("birth_date")
   createdAt DateTime @default(now()) @map("created_at")
