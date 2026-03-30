@@ -12,6 +12,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  User   @map("user")
+  Writer @map("writer")
+}
+
 model User {
   id        String   @id @default(cuid(2))
   firstName String   @map("first_name")
@@ -20,7 +25,7 @@ model User {
   email     String   @unique
   password  String
   bio       String
-  role      String
+  role      Role     @default(User)
   birthDate DateTime @map("birth_date")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -38,7 +43,7 @@ model Writer {
   email     String   @unique
   password  String
   bio       String
-  role      String
+  role      Role     @default(Writer)
   birthDate DateTime @map("birth_date")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
