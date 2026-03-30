@@ -7,7 +7,14 @@ export interface AuthJwtPayload {
   exp?: number;
 }
 
-export type AuthUser = { id: string; role: AuthRole };
+export type AuthSubject = {
+  sub: string;
+  name: string;
+  username: string;
+  email: string;
+  createdAt: string;
+  role: AuthRole;
+};
 
 declare global {
   namespace Express {
