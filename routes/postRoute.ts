@@ -6,7 +6,6 @@ import {
   getPost,
   updatePost,
   deletePost,
-  createComment,
 } from '@/controllers/postController.js';
 import requireRole from '@/middleware/requireRole.js';
 import verifyToken from '@/middleware/verifyToken.js';
@@ -20,6 +19,5 @@ postRoutes
 postRoutes
   .route('/:postId')
   .get(verifyToken, requireRole('user', 'writer'), getPost)
-  .post(verifyToken, requireRole('user', 'writer'), createComment)
   .put(verifyToken, requireRole('writer'), updatePost)
   .delete(verifyToken, requireRole('writer'), deletePost);
