@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 
 import type { Post } from '@/schemas/postSchema.js';
 
+import { formatErrors } from '@/helpers/errors.js';
 import { prisma } from '@/lib/prisma.js';
 import { CreatePostSchema, UpdatePostSchema } from '@/schemas/postSchema.js';
 
@@ -15,7 +16,7 @@ export async function createPost(req: Request, res: Response) {
     }
 
     if (!writerId) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json(formatErrors('unauthorized', 'Unauthorized'));
     }
 
     await prisma.post.create({
@@ -25,7 +26,7 @@ export async function createPost(req: Request, res: Response) {
       },
     });
 
-    res.json({ message: 'Post created successfully' });
+    res.status(201).json({ message: 'Post created successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -64,7 +65,7 @@ export async function getPost(req: Request, res: Response) {
     const post: Post | null = await prisma.post.findFirst({ where: { id: postId as string } });
 
     if (!post) {
-      return res.status(401).json({ message: 'Post does not exist' });
+      return res.status(401).json(formatErrors('not_found', 'Post not found'));
     }
 
     res.json(post);
@@ -83,7 +84,7 @@ export async function updatePost(req: Request, res: Response) {
     const newPost = UpdatePostSchema.safeParse(req.body);
 
     if (!post) {
-      return res.status(401).json({ message: 'Post does not exist' });
+      return res.status(401).json(formatErrors('not_found', 'Post not found'));
     }
 
     if (!newPost.success) {
@@ -99,7 +100,7 @@ export async function updatePost(req: Request, res: Response) {
       data: cleanData,
     });
 
-    res.json({ message: 'Post updated successfully' });
+    res.status(200).json({ message: 'Post updated successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -114,12 +115,12 @@ export async function deletePost(req: Request, res: Response) {
     const post: Post | null = await prisma.post.findUnique({ where: { id: postId as string } });
 
     if (!post) {
-      return res.status(401).json({ message: 'Post does not exist' });
+      return res.status(401).json(formatErrors('not_found', 'Post not found'));
     }
 
     await prisma.post.delete({ where: { id: postId as string } });
 
-    res.json({ message: 'Post deleted successfully' });
+    res.status(200).json({ message: 'Post deleted successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });

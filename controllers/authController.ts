@@ -4,6 +4,7 @@ import jwt, { type SignOptions } from 'jsonwebtoken';
 
 import type { AuthRole } from '@/types/index.js';
 
+import { formatErrors } from '@/helpers/errors.js';
 import { validateHashedPassword } from '@/helpers/password.js';
 import { prisma } from '@/lib/prisma.js';
 import { LoginSchema } from '@/schemas/authSchema.js';
@@ -29,7 +30,7 @@ export async function login(req: Request, res: Response) {
       : false;
 
     if (!userPasswordOk && !writerPasswordOk) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json(formatErrors('unauthorized', 'Invalid credentials'));
     }
 
     if (userPasswordOk && writerPasswordOk) {
