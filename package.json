@@ -9,10 +9,10 @@
   "main": "app.ts",
   "scripts": {
     "dev": "tsx watch app.js",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "fmt:check": "oxfmt --check",
-    "fmt": "oxfmt",
     "postinstall": "prisma generate && prisma migrate deploy"
   },
   "dependencies": {
@@ -37,7 +37,7 @@
     "@types/passport": "^1.0.17",
     "@types/passport-jwt": "^4.0.1",
     "@types/pg": "^8.18.0",
-    "oxfmt": "^0.41.0",
+    "oxfmt": "^0.42.0",
     "oxlint": "^1.56.0",
     "prisma": "^7.6.0",
     "tsx": "^4.21.0",
