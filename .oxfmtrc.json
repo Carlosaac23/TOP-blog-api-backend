@@ -15,4 +15,7 @@
       "unknown",
     ],
   },
+  "sortPackageJson": {
+    "sortScripts": true,
+  },
 }
