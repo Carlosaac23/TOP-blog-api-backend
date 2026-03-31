@@ -73,3 +73,44 @@ export async function login(req: Request, res: Response) {
     return res.status(500).json({ message: 'Unknown error ocurred' });
   }
 }
+
+export async function getSubjectProfile(req: Request, res: Response) {
+  try {
+    const { user } = req;
+
+    if (user?.role === 'user') {
+      const userProfile = await prisma.user.findUnique({
+        where: { id: user?.sub as string },
+        omit: {
+          password: true,
+          updatedAt: true,
+        },
+      });
+
+      if (!userProfile) {
+        return res.status(404).json(formatErrors('not_found', 'User not found'));
+      }
+
+      return res.status(200).json({ profile: userProfile });
+    } else {
+      const writerProfile = await prisma.writer.findUnique({
+        where: { id: user?.sub as string },
+        omit: {
+          password: true,
+          updatedAt: true,
+        },
+      });
+
+      if (!writerProfile) {
+        return res.status(404).json(formatErrors('not_found', 'Writer not found'));
+      }
+
+      return res.status(200).json({ profile: writerProfile });
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ message: error.message });
+    }
+    return res.status(500).json({ message: 'Unknown error ocurred' });
+  }
+}
