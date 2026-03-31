@@ -4,7 +4,7 @@ export const CreateCommentSchema = z.object({
   content: z.string().min(1),
 });
 
-export const CommentSchema = CreateCommentSchema.extend({
+const CommentSchema = CreateCommentSchema.extend({
   id: cuid2(),
   createdAt: z.date(),
   updatedAt: z.date(),

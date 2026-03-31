@@ -4,7 +4,7 @@ import type { Comment } from '@/schemas/commentSchema.js';
 
 import { formatErrors } from '@/helpers/errors.js';
 import { prisma } from '@/lib/prisma.js';
-import { CreateCommentSchema, CommentSchema } from '@/schemas/commentSchema.js';
+import { CreateCommentSchema } from '@/schemas/commentSchema.js';
 
 export async function createComment(req: Request, res: Response) {
   try {
@@ -16,13 +16,13 @@ export async function createComment(req: Request, res: Response) {
       return res.status(400).json({ message: 'Invalid postId' });
     }
 
-    const result = CommentSchema.safeParse(req.body);
+    const result = CreateCommentSchema.safeParse(req.body);
 
     if (!result.success) {
       return res.status(400).json({ errors: result.error.issues });
     }
 
-    const comment = await prisma.comment.create({
+    await prisma.comment.create({
       data: {
         content: result.data.content,
         userId,
@@ -30,7 +30,7 @@ export async function createComment(req: Request, res: Response) {
       },
     });
 
-    res.json(comment);
+    res.status(201).json({ messsage: 'Comment created successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
