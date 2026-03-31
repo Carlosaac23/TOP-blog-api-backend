@@ -12,8 +12,7 @@
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
-    "postinstall": "prisma generate && prisma migrate deploy"
+    "lint:fix": "oxlint --fix"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.5.0",
