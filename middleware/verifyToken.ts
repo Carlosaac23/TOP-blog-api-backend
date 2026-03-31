@@ -1,5 +1,3 @@
-import { configDotenv } from 'dotenv';
-configDotenv({ path: '.env.local' });
 import type { Request, Response, NextFunction } from 'express';
 
 import jwt from 'jsonwebtoken';

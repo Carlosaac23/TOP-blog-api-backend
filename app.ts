@@ -1,6 +1,3 @@
-import { configDotenv } from 'dotenv';
-configDotenv({ path: '.env.local' });
-
 import cors from 'cors';
 import express from 'express';
 

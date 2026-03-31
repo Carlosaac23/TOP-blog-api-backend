@@ -1,6 +1,3 @@
-import { configDotenv } from 'dotenv';
-configDotenv({ path: '.env.local' });
-
 import { PrismaPg } from '@prisma/adapter-pg';
 
 import { PrismaClient } from '@/generated/prisma/client.js';
