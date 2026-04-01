@@ -26,7 +26,7 @@ export async function createPost(req: Request, res: Response) {
       },
     });
 
-    res.status(201).json({ message: 'Post created successfully' });
+    return res.status(201).json({ message: 'Post created successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -50,7 +50,7 @@ export async function getPosts(_req: Request, res: Response) {
       },
     });
 
-    res.json(posts);
+    return res.json(posts);
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -68,7 +68,7 @@ export async function getPost(req: Request, res: Response) {
       return res.status(401).json(formatErrors('not_found', 'Post not found'));
     }
 
-    res.json(post);
+    return res.json(post);
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -111,7 +111,7 @@ export async function updatePost(req: Request, res: Response) {
       data: cleanData,
     });
 
-    res.status(200).json({ message: 'Post updated successfully' });
+    return res.status(200).json({ message: 'Post updated successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -141,7 +141,7 @@ export async function deletePost(req: Request, res: Response) {
 
     await prisma.post.delete({ where: { id: postId as string } });
 
-    res.status(200).json({ message: 'Post deleted successfully' });
+    return res.status(200).json({ message: 'Post deleted successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
