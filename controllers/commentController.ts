@@ -61,9 +61,18 @@ export async function updateComment(req: Request, res: Response) {
   try {
     const userId = req.user?.sub;
     const { commentId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json(formatErrors('unauthorized', 'Unauthorized'));
+    }
+
     const comment: Comment | null = await prisma.comment.findUnique({
       where: { id: commentId as string },
     });
+
+    if (!comment) {
+      return res.status(404).json(formatErrors('not_found', 'Comment not found'));
+    }
 
     if (userId !== comment?.userId) {
       return res.status(403).json(formatErrors('forbidden', 'Not allowed to do this'));
@@ -88,13 +97,23 @@ export async function updateComment(req: Request, res: Response) {
 
 export async function deleteComment(req: Request, res: Response) {
   try {
+    const userId = req.user?.sub;
     const { commentId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json(formatErrors('unauthorized', 'Unauthorized'));
+    }
+
     const comment: Comment | null = await prisma.comment.findUnique({
       where: { id: commentId as string },
     });
 
     if (!comment) {
       return res.status(404).json(formatErrors('not_found', 'Comment not found'));
+    }
+
+    if (comment.userId !== userId) {
+      return res.status(403).json(formatErrors('forbidden', 'Not allowed to do this'));
     }
 
     await prisma.comment.delete({ where: { id: commentId as string } });

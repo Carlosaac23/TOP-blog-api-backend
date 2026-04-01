@@ -79,13 +79,24 @@ export async function getPost(req: Request, res: Response) {
 
 export async function updatePost(req: Request, res: Response) {
   try {
+    const userId = req.user?.sub;
     const { postId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json(formatErrors('unauthorized', 'Unauthorized'));
+    }
+
     const post: Post | null = await prisma.post.findUnique({ where: { id: postId as string } });
-    const newPost = UpdatePostSchema.safeParse(req.body);
 
     if (!post) {
       return res.status(401).json(formatErrors('not_found', 'Post not found'));
     }
+
+    if (post.writerId !== userId) {
+      return res.status(403).json(formatErrors('forbidden', 'Not allowed to do this'));
+    }
+
+    const newPost = UpdatePostSchema.safeParse(req.body);
 
     if (!newPost.success) {
       return res.status(400).json({ errors: newPost.error.issues });
@@ -111,11 +122,21 @@ export async function updatePost(req: Request, res: Response) {
 
 export async function deletePost(req: Request, res: Response) {
   try {
+    const userId = req.user?.sub;
     const { postId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json(formatErrors('unauthorized', 'Unauthorized'));
+    }
+
     const post: Post | null = await prisma.post.findUnique({ where: { id: postId as string } });
 
     if (!post) {
       return res.status(404).json(formatErrors('not_found', 'Post not found'));
+    }
+
+    if (post.writerId !== userId) {
+      return res.status(403).json(formatErrors('forbidden', 'Not allowed to do this'));
     }
 
     await prisma.post.delete({ where: { id: postId as string } });
