@@ -14,7 +14,7 @@ export const commentRoutes: Router = Router({ mergeParams: true });
 commentRoutes
   .route('/')
   .get(verifyToken, requireRole('user', 'writer'), getCommentsByPost)
-  .post(verifyToken, requireRole('user', 'writer'), createComment);
+  .post(verifyToken, requireRole('user'), createComment);
 commentRoutes
   .route('/:commentId')
   .put(verifyToken, requireRole('user', 'writer'), updateComment)

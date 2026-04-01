@@ -41,7 +41,7 @@ export function createSubject(subjectRole: AuthRole) {
         });
       }
 
-      res.status(201).json({ message: `${capitalize(subjectRole)} created successfully` });
+      return res.status(201).json({ message: `${capitalize(subjectRole)} created successfully` });
     } catch (error) {
       if (error instanceof Error) {
         return res.status(500).json({ message: error.message });
@@ -102,7 +102,7 @@ export function updateSubject(subjectRole: AuthRole) {
         await prisma.writer.update({ where: { id }, data: cleanData });
       }
 
-      res.status(200).json({ message: `${capitalize(subjectRole)} updated successfully` });
+      return res.status(200).json({ message: `${capitalize(subjectRole)} updated successfully` });
     } catch (error) {
       if (error instanceof Error) {
         return res.status(500).json({ message: error.message });
@@ -149,7 +149,7 @@ export function deleteSubject(subjectRole: AuthRole) {
         await prisma.writer.delete({ where: { id } });
       }
 
-      res.status(200).json({ message: `${capitalize(subjectRole)} successfully deleted` });
+      return res.status(200).json({ message: `${capitalize(subjectRole)} successfully deleted` });
     } catch (error) {
       if (error instanceof Error) {
         return res.status(500).json({ message: error.message });

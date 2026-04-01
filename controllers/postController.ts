@@ -26,7 +26,7 @@ export async function createPost(req: Request, res: Response) {
       },
     });
 
-    res.status(201).json({ message: 'Post created successfully' });
+    return res.status(201).json({ message: 'Post created successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -50,7 +50,7 @@ export async function getPosts(_req: Request, res: Response) {
       },
     });
 
-    res.json(posts);
+    return res.json(posts);
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -68,7 +68,7 @@ export async function getPost(req: Request, res: Response) {
       return res.status(401).json(formatErrors('not_found', 'Post not found'));
     }
 
-    res.json(post);
+    return res.json(post);
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -79,13 +79,24 @@ export async function getPost(req: Request, res: Response) {
 
 export async function updatePost(req: Request, res: Response) {
   try {
+    const userId = req.user?.sub;
     const { postId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json(formatErrors('unauthorized', 'Unauthorized'));
+    }
+
     const post: Post | null = await prisma.post.findUnique({ where: { id: postId as string } });
-    const newPost = UpdatePostSchema.safeParse(req.body);
 
     if (!post) {
       return res.status(401).json(formatErrors('not_found', 'Post not found'));
     }
+
+    if (post.writerId !== userId) {
+      return res.status(403).json(formatErrors('forbidden', 'Not allowed to do this'));
+    }
+
+    const newPost = UpdatePostSchema.safeParse(req.body);
 
     if (!newPost.success) {
       return res.status(400).json({ errors: newPost.error.issues });
@@ -100,7 +111,7 @@ export async function updatePost(req: Request, res: Response) {
       data: cleanData,
     });
 
-    res.status(200).json({ message: 'Post updated successfully' });
+    return res.status(200).json({ message: 'Post updated successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -111,16 +122,26 @@ export async function updatePost(req: Request, res: Response) {
 
 export async function deletePost(req: Request, res: Response) {
   try {
+    const userId = req.user?.sub;
     const { postId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json(formatErrors('unauthorized', 'Unauthorized'));
+    }
+
     const post: Post | null = await prisma.post.findUnique({ where: { id: postId as string } });
 
     if (!post) {
       return res.status(404).json(formatErrors('not_found', 'Post not found'));
     }
 
+    if (post.writerId !== userId) {
+      return res.status(403).json(formatErrors('forbidden', 'Not allowed to do this'));
+    }
+
     await prisma.post.delete({ where: { id: postId as string } });
 
-    res.status(200).json({ message: 'Post deleted successfully' });
+    return res.status(200).json({ message: 'Post deleted successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });

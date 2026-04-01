@@ -30,7 +30,7 @@ export async function createComment(req: Request, res: Response) {
       },
     });
 
-    res.status(201).json({ messsage: 'Comment created successfully' });
+    return res.status(201).json({ messsage: 'Comment created successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -48,7 +48,7 @@ export async function getCommentsByPost(req: Request, res: Response) {
       include: { user: { select: { firstName: true, lastName: true, username: true } } },
     });
 
-    res.json(comments);
+    return res.json(comments);
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -61,9 +61,18 @@ export async function updateComment(req: Request, res: Response) {
   try {
     const userId = req.user?.sub;
     const { commentId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json(formatErrors('unauthorized', 'Unauthorized'));
+    }
+
     const comment: Comment | null = await prisma.comment.findUnique({
       where: { id: commentId as string },
     });
+
+    if (!comment) {
+      return res.status(404).json(formatErrors('not_found', 'Comment not found'));
+    }
 
     if (userId !== comment?.userId) {
       return res.status(403).json(formatErrors('forbidden', 'Not allowed to do this'));
@@ -77,7 +86,7 @@ export async function updateComment(req: Request, res: Response) {
 
     await prisma.comment.update({ where: { id: commentId as string }, data: result.data });
 
-    res.status(200).json({ message: 'Comment updated successfully' });
+    return res.status(200).json({ message: 'Comment updated successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -88,7 +97,13 @@ export async function updateComment(req: Request, res: Response) {
 
 export async function deleteComment(req: Request, res: Response) {
   try {
+    const userId = req.user?.sub;
     const { commentId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json(formatErrors('unauthorized', 'Unauthorized'));
+    }
+
     const comment: Comment | null = await prisma.comment.findUnique({
       where: { id: commentId as string },
     });
@@ -97,9 +112,13 @@ export async function deleteComment(req: Request, res: Response) {
       return res.status(404).json(formatErrors('not_found', 'Comment not found'));
     }
 
+    if (comment.userId !== userId) {
+      return res.status(403).json(formatErrors('forbidden', 'Not allowed to do this'));
+    }
+
     await prisma.comment.delete({ where: { id: commentId as string } });
 
-    res.status(200).json({ message: 'Comment deleted successfully' });
+    return res.status(200).json({ message: 'Comment deleted successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
