@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
 
-import type { Post } from '@/schemas/postSchema.js';
+import type { Post } from '../schemas/postSchema.js';
 
-import { formatErrors } from '@/helpers/errors.js';
-import { prisma } from '@/lib/prisma.js';
-import { CreatePostSchema, UpdatePostSchema } from '@/schemas/postSchema.js';
+import { formatErrors } from '../helpers/errors.js';
+import { prisma } from '../lib/prisma.js';
+import { CreatePostSchema, UpdatePostSchema } from '../schemas/postSchema.js';
 
 export async function createPost(req: Request, res: Response) {
   try {
