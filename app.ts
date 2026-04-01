@@ -1,4 +1,4 @@
-import cors from 'cors';
+import cors, { type CorsOptions } from 'cors';
 import express from 'express';
 
 import passport from '@/config/passport.js';
@@ -9,7 +9,23 @@ import { userRoutes, writerRoutes } from '@/routes/subjectRoute.js';
 
 const app = express();
 
-app.use(cors());
+const allowedDomains = (process.env['ALLOWED_ORIGINS'] ?? '')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
+const corsOptions: CorsOptions = {
+  origin: (origin, cb) => {
+    if (!origin || allowedDomains.includes(origin)) {
+      cb(null, true);
+      return;
+    }
+
+    cb(new Error('Not allowed by CORS'));
+  },
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
