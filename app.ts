@@ -9,8 +9,15 @@ import { userRoutes, writerRoutes } from '@/routes/subjectRoute.js';
 
 const app = express();
 
+const allowedOrigins = process.env['ALLOWED_ORIGINS']
+  ?.split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
 const corsOptions: CorsOptions = {
-  origin: process.env['ALLOWED_ORIGIN'],
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 app.use(cors(corsOptions));
