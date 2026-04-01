@@ -9,23 +9,8 @@ import { userRoutes, writerRoutes } from '@/routes/subjectRoute.js';
 
 const app = express();
 
-const allowedDomains = (process.env['ALLOWED_ORIGINS'] ?? '')
-  .split(',')
-  .map(origin => origin.trim())
-  .filter(Boolean);
-
 const corsOptions: CorsOptions = {
-  origin: (origin, cb) => {
-    if (!origin || allowedDomains.includes(origin)) {
-      cb(null, true);
-      return;
-    }
-
-    cb(new Error('Not allowed by CORS'));
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200,
+  origin: process.env['ALLOWED_ORIGIN'],
 };
 
 app.use(cors(corsOptions));
