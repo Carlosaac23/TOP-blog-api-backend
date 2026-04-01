@@ -30,9 +30,6 @@
     "erasableSyntaxOnly": true,
 
     // Style Options
-    "paths": {
-      "@/*": ["./*"]
-    },
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     // "noImplicitReturns": true,
