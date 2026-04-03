@@ -2,14 +2,14 @@ import type { Request, Response } from 'express';
 
 import type { Comment } from '../schemas/commentSchema.js';
 
-import { formatErrors } from '../helpers/errors.js';
+import { apiError } from '../helpers/errors.js';
 import { prisma } from '../lib/prisma.js';
 import { CreateCommentSchema } from '../schemas/commentSchema.js';
 
 export async function createComment(req: Request, res: Response) {
   try {
     const userId = req.user?.sub;
-    if (!userId) return res.status(401).json(formatErrors('unauthorized', 'Unauthorized'));
+    if (!userId) return res.status(401).json(apiError('unauthorized', 'Unauthorized'));
 
     const postIdParam = req.params['postId'];
     if (typeof postIdParam !== 'string') {
@@ -30,7 +30,7 @@ export async function createComment(req: Request, res: Response) {
       },
     });
 
-    return res.status(201).json({ messsage: 'Comment created successfully' });
+    return res.status(201).json({ message: 'Comment created successfully' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -63,7 +63,7 @@ export async function updateComment(req: Request, res: Response) {
     const { commentId } = req.params;
 
     if (!userId) {
-      return res.status(401).json(formatErrors('unauthorized', 'Unauthorized'));
+      return res.status(401).json(apiError('unauthorized', 'Unauthorized'));
     }
 
     const comment: Comment | null = await prisma.comment.findUnique({
@@ -71,11 +71,11 @@ export async function updateComment(req: Request, res: Response) {
     });
 
     if (!comment) {
-      return res.status(404).json(formatErrors('not_found', 'Comment not found'));
+      return res.status(404).json(apiError('not_found', 'Comment not found'));
     }
 
     if (userId !== comment?.userId) {
-      return res.status(403).json(formatErrors('forbidden', 'Not allowed to do this'));
+      return res.status(403).json(apiError('forbidden', 'Not allowed to do this'));
     }
 
     const result = CreateCommentSchema.safeParse(req.body);
@@ -101,7 +101,7 @@ export async function deleteComment(req: Request, res: Response) {
     const { commentId } = req.params;
 
     if (!userId) {
-      return res.status(401).json(formatErrors('unauthorized', 'Unauthorized'));
+      return res.status(401).json(apiError('unauthorized', 'Unauthorized'));
     }
 
     const comment: Comment | null = await prisma.comment.findUnique({
@@ -109,11 +109,11 @@ export async function deleteComment(req: Request, res: Response) {
     });
 
     if (!comment) {
-      return res.status(404).json(formatErrors('not_found', 'Comment not found'));
+      return res.status(404).json(apiError('not_found', 'Comment not found'));
     }
 
     if (comment.userId !== userId) {
-      return res.status(403).json(formatErrors('forbidden', 'Not allowed to do this'));
+      return res.status(403).json(apiError('forbidden', 'Not allowed to do this'));
     }
 
     await prisma.comment.delete({ where: { id: commentId as string } });

@@ -6,7 +6,7 @@
   "license": "ISC",
   "author": "Carlos Acosta",
   "type": "module",
-  "main": "app.ts",
+  "main": "dist/app.js",
   "scripts": {
     "dev": "tsx watch --env-file-if-exists=.env.local app.ts",
     "fmt": "oxfmt",

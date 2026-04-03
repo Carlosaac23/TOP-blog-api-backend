@@ -4,7 +4,7 @@ import jwt, { type SignOptions } from 'jsonwebtoken';
 
 import type { AuthRole } from '../types/index.js';
 
-import { formatErrors } from '../helpers/errors.js';
+import { apiError, validationError } from '../helpers/errors.js';
 import { validateHashedPassword } from '../helpers/password.js';
 import { prisma } from '../lib/prisma.js';
 import { LoginSchema } from '../schemas/authSchema.js';
@@ -14,7 +14,7 @@ export async function login(req: Request, res: Response) {
     const result = LoginSchema.safeParse(req.body);
 
     if (!result.success) {
-      return res.status(400).json({ errors: result.error.issues });
+      return res.status(400).json(validationError(result.error.issues));
     }
 
     const { identifier, password } = result.data;
@@ -30,7 +30,7 @@ export async function login(req: Request, res: Response) {
       : false;
 
     if (!userPasswordOk && !writerPasswordOk) {
-      return res.status(401).json(formatErrors('unauthorized', 'Invalid credentials'));
+      return res.status(401).json(apiError('unauthorized', 'Invalid credentials'));
     }
 
     if (userPasswordOk && writerPasswordOk) {
@@ -43,7 +43,7 @@ export async function login(req: Request, res: Response) {
     const role: AuthRole = userPasswordOk ? 'user' : 'writer';
 
     if (!process.env['JWT_SECRET']) {
-      return res.status(500).json({ message: 'JWT_SECRET is not configured' });
+      return res.status(500).json(apiError('internal_error', 'JWT secret is not configured'));
     }
 
     const jwtSecret = process.env['JWT_SECRET'];
@@ -67,10 +67,8 @@ export async function login(req: Request, res: Response) {
 
     return res.json({ token });
   } catch (error) {
-    if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
-    }
-    return res.status(500).json({ message: 'Unknown error ocurred' });
+    console.error(error);
+    return res.status(500).json(apiError('internal_error', 'Internal server error'));
   }
 }
 
@@ -88,7 +86,7 @@ export async function getSubjectProfile(req: Request, res: Response) {
       });
 
       if (!userProfile) {
-        return res.status(404).json(formatErrors('not_found', 'User not found'));
+        return res.status(404).json(apiError('not_found', 'User not found'));
       }
 
       return res.status(200).json({ profile: userProfile });
@@ -102,7 +100,7 @@ export async function getSubjectProfile(req: Request, res: Response) {
       });
 
       if (!writerProfile) {
-        return res.status(404).json(formatErrors('not_found', 'Writer not found'));
+        return res.status(404).json(apiError('not_found', 'Writer not found'));
       }
 
       return res.status(200).json({ profile: writerProfile });

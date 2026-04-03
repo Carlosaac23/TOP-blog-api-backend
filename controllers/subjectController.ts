@@ -4,7 +4,7 @@ import type { AuthRole, AuthSubject } from '../types/index.js';
 
 import { Role } from '../generated/prisma/enums.js';
 import { capitalize } from '../helpers/capitalize.js';
-import { formatErrors } from '../helpers/errors.js';
+import { apiError } from '../helpers/errors.js';
 import { generateHashedPassword } from '../helpers/password.js';
 import { prisma } from '../lib/prisma.js';
 import {
@@ -64,11 +64,11 @@ export function updateSubject(subjectRole: AuthRole) {
     const authSubject = req.user as AuthSubject | undefined;
 
     if (!authSubject) {
-      return res.status(401).json(formatErrors('unathorized', 'Unauthorized'));
+      return res.status(401).json(apiError('unathorized', 'Authentication required'));
     }
 
     if (authSubject.role !== subjectRole || authSubject.sub !== id) {
-      return res.status(403).json(formatErrors('forbidden', 'Forbidden'));
+      return res.status(403).json(apiError('forbidden', 'You cannot modify this account'));
     }
 
     if (!result.success) {
@@ -90,7 +90,7 @@ export function updateSubject(subjectRole: AuthRole) {
         });
 
         if (!user) {
-          return res.status(404).json(formatErrors('not_found', 'User not found'));
+          return res.status(404).json(apiError('not_found', 'User not found'));
         }
 
         await prisma.user.update({ where: { id }, data: cleanData });
@@ -100,7 +100,7 @@ export function updateSubject(subjectRole: AuthRole) {
         });
 
         if (!writer) {
-          return res.status(401).json(formatErrors('not_found', 'Writer not found'));
+          return res.status(404).json(apiError('not_found', 'Writer not found'));
         }
 
         await prisma.writer.update({ where: { id }, data: cleanData });
@@ -123,11 +123,11 @@ export function deleteSubject(subjectRole: AuthRole) {
     const authSubject = req.user as AuthSubject | undefined;
 
     if (!authSubject) {
-      return res.status(401).json(formatErrors('unauthorized', 'Unauthorized'));
+      return res.status(401).json(apiError('unauthorized', 'Authentication required'));
     }
 
     if (authSubject.role !== subjectRole || authSubject.sub !== id) {
-      return res.status(401).json({ message: 'Forbidden' });
+      return res.status(403).json(apiError('forbidden', 'You cannot delete this account'));
     }
 
     try {
@@ -137,7 +137,7 @@ export function deleteSubject(subjectRole: AuthRole) {
         });
 
         if (!user) {
-          return res.status(401).json(formatErrors('not_found', 'User not found'));
+          return res.status(404).json(apiError('not_found', 'User not found'));
         }
 
         await prisma.user.delete({ where: { id } });
@@ -147,7 +147,7 @@ export function deleteSubject(subjectRole: AuthRole) {
         });
 
         if (!writer) {
-          return res.status(401).json(formatErrors('not_found', 'Writer not found'));
+          return res.status(404).json(apiError('not_found', 'Writer not found'));
         }
 
         await prisma.writer.delete({ where: { id } });
