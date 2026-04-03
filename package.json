@@ -6,9 +6,8 @@
   "license": "ISC",
   "author": "Carlos Acosta",
   "type": "module",
-  "main": "app.ts",
+  "main": "dist/app.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
     "dev": "tsx watch --env-file-if-exists=.env.local app.ts",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
@@ -39,7 +38,6 @@
     "oxfmt": "^0.42.0",
     "oxlint": "^1.56.0",
     "prisma": "^7.6.0",
-    "tsc-alias": "^1.8.16",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   }
