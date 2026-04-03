@@ -1,4 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm exec prisma generate && pnpm exec prisma migrate deploy && pnpm run build"
+  "buildCommand": "pnpm exec prisma generate && pnpm exec prisma migrate deploy && pnpm run build",
+  "functions": {
+    "dist/app.js": {
+      "runtime": "nodejs20.x"
+    }
+  }
 }
