@@ -2,12 +2,12 @@ import type { Request, Response } from 'express';
 
 import jwt, { type SignOptions } from 'jsonwebtoken';
 
-import type { AuthRole } from '../types/index.js';
+import type { AuthRole } from '@/types/index.js';
 
-import { formatErrors } from '../helpers/errors.js';
-import { validateHashedPassword } from '../helpers/password.js';
-import { prisma } from '../lib/prisma.js';
-import { LoginSchema } from '../schemas/authSchema.js';
+import { formatErrors } from '@/helpers/errors.js';
+import { validateHashedPassword } from '@/helpers/password.js';
+import { prisma } from '@/lib/prisma.js';
+import { LoginSchema } from '@/schemas/authSchema.js';
 
 export async function login(req: Request, res: Response) {
   try {

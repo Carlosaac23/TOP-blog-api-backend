@@ -2,9 +2,9 @@ import type { Request, Response, NextFunction } from 'express';
 
 import jwt from 'jsonwebtoken';
 
-import type { AuthRole } from '../types/index.js';
+import type { AuthRole } from '@/types/index.js';
 
-import { formatErrors } from '../helpers/errors.js';
+import { formatErrors } from '@/helpers/errors.js';
 
 export default function verifyToken(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;

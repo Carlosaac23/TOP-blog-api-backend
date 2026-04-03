@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from 'express';
 
-import type { AuthRole } from '../types/index.js';
+import type { AuthRole } from '@/types/index.js';
 
-import { formatErrors } from '../helpers/errors.js';
+import { formatErrors } from '@/helpers/errors.js';
 
 export default function requireRole(...allowedRoles: AuthRole[]) {
   return (req: Request, res: Response, next: NextFunction) => {

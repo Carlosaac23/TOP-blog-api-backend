@@ -1,17 +1,13 @@
 import type { Request, Response } from 'express';
 
-import type { AuthRole, AuthSubject } from '../types/index.js';
+import type { AuthRole, AuthSubject } from '@/types/index.js';
 
-import { Role } from '../generated/prisma/enums.js';
-import { capitalize } from '../helpers/capitalize.js';
-import { formatErrors } from '../helpers/errors.js';
-import { generateHashedPassword } from '../helpers/password.js';
-import { prisma } from '../lib/prisma.js';
-import {
-  CreateSubjectSchema,
-  UpdateSubjectSchema,
-  type Subject,
-} from '../schemas/subjectSchema.js';
+import { Role } from '@/generated/prisma/enums.js';
+import { capitalize } from '@/helpers/capitalize.js';
+import { formatErrors } from '@/helpers/errors.js';
+import { generateHashedPassword } from '@/helpers/password.js';
+import { prisma } from '@/lib/prisma.js';
+import { CreateSubjectSchema, UpdateSubjectSchema, type Subject } from '@/schemas/subjectSchema.js';
 
 export function createSubject(subjectRole: AuthRole) {
   return async function (req: Request, res: Response) {

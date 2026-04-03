@@ -5,9 +5,9 @@ import {
   deleteComment,
   getCommentsByPost,
   updateComment,
-} from '../controllers/commentController.js';
-import requireRole from '../middleware/requireRole.js';
-import verifyToken from '../middleware/verifyToken.js';
+} from '@/controllers/commentController.js';
+import requireRole from '@/middleware/requireRole.js';
+import verifyToken from '@/middleware/verifyToken.js';
 
 export const commentRoutes: Router = Router({ mergeParams: true });
 

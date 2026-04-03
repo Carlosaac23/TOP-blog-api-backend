@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
-import { createSubject, updateSubject, deleteSubject } from '../controllers/subjectController.js';
-import requireRole from '../middleware/requireRole.js';
-import verifyToken from '../middleware/verifyToken.js';
+import { createSubject, updateSubject, deleteSubject } from '@/controllers/subjectController.js';
+import requireRole from '@/middleware/requireRole.js';
+import verifyToken from '@/middleware/verifyToken.js';
 
 export const userRoutes: Router = Router();
 export const writerRoutes: Router = Router();

@@ -6,9 +6,9 @@ import {
   getPost,
   updatePost,
   deletePost,
-} from '../controllers/postController.js';
-import requireRole from '../middleware/requireRole.js';
-import verifyToken from '../middleware/verifyToken.js';
+} from '@/controllers/postController.js';
+import requireRole from '@/middleware/requireRole.js';
+import verifyToken from '@/middleware/verifyToken.js';
 
 export const postRoutes: Router = Router();
 
