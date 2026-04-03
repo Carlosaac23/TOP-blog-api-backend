@@ -8,6 +8,7 @@
   "type": "module",
   "main": "app.ts",
   "scripts": {
+    "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
     "dev": "tsx watch --env-file-if-exists=.env.local app.ts",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
