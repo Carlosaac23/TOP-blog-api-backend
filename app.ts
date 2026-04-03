@@ -3,11 +3,11 @@ import type { Express } from 'express';
 import cors, { type CorsOptions } from 'cors';
 import express from 'express';
 
-import passport from '@/config/passport.js';
-import { authRoutes } from '@/routes/authRoute.js';
-import { commentRoutes } from '@/routes/commentRoute.js';
-import { postRoutes } from '@/routes/postRoute.js';
-import { userRoutes, writerRoutes } from '@/routes/subjectRoute.js';
+import passport from './config/passport.js';
+import { authRoutes } from './routes/authRoute.js';
+import { commentRoutes } from './routes/commentRoute.js';
+import { postRoutes } from './routes/postRoute.js';
+import { userRoutes, writerRoutes } from './routes/subjectRoute.js';
 
 const app: Express = express();
 

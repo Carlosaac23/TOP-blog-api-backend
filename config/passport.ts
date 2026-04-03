@@ -6,9 +6,9 @@ import {
   type VerifiedCallback,
 } from 'passport-jwt';
 
-import type { AuthJwtPayload } from '@/types/index.js';
+import type { AuthJwtPayload } from '../types/index.js';
 
-import { prisma } from '@/lib/prisma.js';
+import { prisma } from '../lib/prisma.js';
 
 const opts: StrategyOptionsWithoutRequest = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

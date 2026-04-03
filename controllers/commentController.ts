@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
 
-import type { Comment } from '@/schemas/commentSchema.js';
+import type { Comment } from '../schemas/commentSchema.js';
 
-import { formatErrors } from '@/helpers/errors.js';
-import { prisma } from '@/lib/prisma.js';
-import { CreateCommentSchema } from '@/schemas/commentSchema.js';
+import { formatErrors } from '../helpers/errors.js';
+import { prisma } from '../lib/prisma.js';
+import { CreateCommentSchema } from '../schemas/commentSchema.js';
 
 export async function createComment(req: Request, res: Response) {
   try {
