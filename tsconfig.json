@@ -49,8 +49,5 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true
-  },
-  "tsc-alias": {
-    "resolveFullPaths": true
   }
 }

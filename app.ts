@@ -34,8 +34,6 @@ app.use('/api/posts', postRoutes);
 app.use('/api/posts/:postId/comments', commentRoutes);
 app.use('/api/comments', commentRoutes);
 
-export default app;
-
 app.listen(process.env['PORT'], error => {
   if (error) {
     console.error(error);
