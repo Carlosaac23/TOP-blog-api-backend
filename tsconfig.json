@@ -2,8 +2,8 @@
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
-    // "rootDir": "./src",
-    // "outDir": "./dist",
+    "rootDir": ".",
+    "outDir": "./dist",
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
@@ -30,6 +30,9 @@
     "erasableSyntaxOnly": true,
 
     // Style Options
+    "paths": {
+      "@/*": ["./*"]
+    },
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     // "noImplicitReturns": true,
