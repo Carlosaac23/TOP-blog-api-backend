@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 
 import type { Post } from '../schemas/postSchema.js';
 
-import { apiError } from '../helpers/errors.js';
+import { apiError, validationError } from '../helpers/errors.js';
 import { prisma } from '../lib/prisma.js';
 import { CreatePostSchema, UpdatePostSchema } from '../schemas/postSchema.js';
 
@@ -12,11 +12,11 @@ export async function createPost(req: Request, res: Response) {
     const newPost = CreatePostSchema.safeParse(req.body);
 
     if (!newPost.success) {
-      return res.status(400).json({ errors: newPost.error.issues });
+      return res.status(400).json(validationError(newPost.error.issues));
     }
 
     if (!writerId) {
-      return res.status(401).json(apiError('unauthorized', 'Unauthorized'));
+      return res.status(401).json(apiError('unauthorized', 'Authentication required'));
     }
 
     await prisma.post.create({
@@ -29,9 +29,8 @@ export async function createPost(req: Request, res: Response) {
     return res.status(201).json({ message: 'Post created successfully' });
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json(apiError('internal_error', error.message));
     }
-    return res.status(500).json({ message: 'Unknown error ocurred' });
   }
 }
 
@@ -50,12 +49,11 @@ export async function getPosts(_req: Request, res: Response) {
       },
     });
 
-    return res.json(posts);
+    return res.json({ posts });
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json(apiError('internal_error', error.message));
     }
-    return res.status(500).json({ message: 'Unknown error ocurred' });
   }
 }
 
@@ -68,12 +66,11 @@ export async function getPost(req: Request, res: Response) {
       return res.status(404).json(apiError('not_found', 'Post not found'));
     }
 
-    return res.json(post);
+    return res.json({ post });
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json(apiError('internal_error', error.message));
     }
-    return res.status(500).json({ message: 'Unknown error ocurred' });
   }
 }
 
@@ -83,7 +80,7 @@ export async function updatePost(req: Request, res: Response) {
     const { postId } = req.params;
 
     if (!userId) {
-      return res.status(401).json(apiError('unauthorized', 'Unauthorized'));
+      return res.status(401).json(apiError('unauthorized', 'Authentication required'));
     }
 
     const post: Post | null = await prisma.post.findUnique({ where: { id: postId as string } });
@@ -99,7 +96,7 @@ export async function updatePost(req: Request, res: Response) {
     const newPost = UpdatePostSchema.safeParse(req.body);
 
     if (!newPost.success) {
-      return res.status(400).json({ errors: newPost.error.issues });
+      return res.status(400).json(validationError(newPost.error.issues));
     }
 
     const cleanData = Object.fromEntries(
@@ -114,9 +111,8 @@ export async function updatePost(req: Request, res: Response) {
     return res.status(200).json({ message: 'Post updated successfully' });
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json(apiError('internal_error', error.message));
     }
-    return res.status(500).json({ message: 'Unknown error ocurred' });
   }
 }
 
@@ -126,7 +122,7 @@ export async function deletePost(req: Request, res: Response) {
     const { postId } = req.params;
 
     if (!userId) {
-      return res.status(401).json(apiError('unauthorized', 'Unauthorized'));
+      return res.status(401).json(apiError('unauthorized', 'Authentication required'));
     }
 
     const post: Post | null = await prisma.post.findUnique({ where: { id: postId as string } });
@@ -144,8 +140,7 @@ export async function deletePost(req: Request, res: Response) {
     return res.status(200).json({ message: 'Post deleted successfully' });
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json(apiError('internal_error', error.message));
     }
-    return res.status(500).json({ message: 'Unknown error ocurred' });
   }
 }

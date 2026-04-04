@@ -1,10 +1,12 @@
 import type { Request, Response } from 'express';
 
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
+
 import type { AuthRole, AuthSubject } from '../types/index.js';
 
 import { Role } from '../generated/prisma/enums.js';
 import { capitalize } from '../helpers/capitalize.js';
-import { apiError } from '../helpers/errors.js';
+import { apiError, validationError } from '../helpers/errors.js';
 import { generateHashedPassword } from '../helpers/password.js';
 import { prisma } from '../lib/prisma.js';
 import {
@@ -18,7 +20,7 @@ export function createSubject(subjectRole: AuthRole) {
     const result = CreateSubjectSchema.safeParse(req.body);
 
     if (!result.success) {
-      return res.status(400).json({ errors: result.error.issues });
+      return res.status(400).json(validationError(result.error.issues));
     }
 
     const { password, lastName, ...restSubject } = result.data;
@@ -47,10 +49,14 @@ export function createSubject(subjectRole: AuthRole) {
 
       return res.status(201).json({ message: `${capitalize(subjectRole)} created successfully` });
     } catch (error) {
-      if (error instanceof Error) {
-        return res.status(500).json({ message: error.message });
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          return res.status(409).json(apiError('conflict', 'Username or email is already taken'));
+        }
       }
-      res.status(500).json({ message: 'Unknown error ocurred' });
+      if (error instanceof Error) {
+        return res.status(500).json(apiError('internal_error', error.message));
+      }
     }
   };
 }
@@ -72,7 +78,7 @@ export function updateSubject(subjectRole: AuthRole) {
     }
 
     if (!result.success) {
-      return res.status(400).json({ errors: result.error.issues });
+      return res.status(400).json(validationError(result.error.issues));
     }
 
     const cleanData = Object.fromEntries(
@@ -109,9 +115,8 @@ export function updateSubject(subjectRole: AuthRole) {
       return res.status(200).json({ message: `${capitalize(subjectRole)} updated successfully` });
     } catch (error) {
       if (error instanceof Error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json(apiError('internal_error', error.message));
       }
-      res.status(500).json({ message: 'Unknown error ocurred' });
     }
   };
 }
@@ -156,9 +161,8 @@ export function deleteSubject(subjectRole: AuthRole) {
       return res.status(200).json({ message: `${capitalize(subjectRole)} successfully deleted` });
     } catch (error) {
       if (error instanceof Error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json(apiError('internal_error', error.message));
       }
-      res.status(500).json({ message: 'Unknown error ocurred' });
     }
   };
 }

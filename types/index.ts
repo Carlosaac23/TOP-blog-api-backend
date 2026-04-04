@@ -9,10 +9,6 @@ export interface AuthJwtPayload {
 
 export type AuthSubject = {
   sub: string;
-  name: string;
-  username: string;
-  email: string;
-  createdAt: string;
   role: AuthRole;
 };
 

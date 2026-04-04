@@ -2,24 +2,24 @@ import type { Request, Response } from 'express';
 
 import type { Comment } from '../schemas/commentSchema.js';
 
-import { apiError } from '../helpers/errors.js';
+import { apiError, validationError } from '../helpers/errors.js';
 import { prisma } from '../lib/prisma.js';
 import { CreateCommentSchema } from '../schemas/commentSchema.js';
 
 export async function createComment(req: Request, res: Response) {
   try {
     const userId = req.user?.sub;
-    if (!userId) return res.status(401).json(apiError('unauthorized', 'Unauthorized'));
+    if (!userId) return res.status(401).json(apiError('unauthorized', 'Authentication required'));
 
     const postIdParam = req.params['postId'];
     if (typeof postIdParam !== 'string') {
-      return res.status(400).json({ message: 'Invalid postId' });
+      return res.status(400).json(apiError('wrong_format', 'Invalid postId'));
     }
 
     const result = CreateCommentSchema.safeParse(req.body);
 
     if (!result.success) {
-      return res.status(400).json({ errors: result.error.issues });
+      return res.status(400).json(validationError(result.error.issues));
     }
 
     await prisma.comment.create({
@@ -33,9 +33,8 @@ export async function createComment(req: Request, res: Response) {
     return res.status(201).json({ message: 'Comment created successfully' });
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json(apiError('internal_error', error.message));
     }
-    return res.status(500).json({ message: 'Unknown error ocurred' });
   }
 }
 
@@ -48,12 +47,11 @@ export async function getCommentsByPost(req: Request, res: Response) {
       include: { user: { select: { firstName: true, lastName: true, username: true } } },
     });
 
-    return res.json(comments);
+    return res.json({ comments });
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json(apiError('internal_error', error.message));
     }
-    return res.status(500).json({ message: 'Unknown error ocurred' });
   }
 }
 
@@ -63,7 +61,7 @@ export async function updateComment(req: Request, res: Response) {
     const { commentId } = req.params;
 
     if (!userId) {
-      return res.status(401).json(apiError('unauthorized', 'Unauthorized'));
+      return res.status(401).json(apiError('unauthorized', 'Authentication required'));
     }
 
     const comment: Comment | null = await prisma.comment.findUnique({
@@ -81,7 +79,7 @@ export async function updateComment(req: Request, res: Response) {
     const result = CreateCommentSchema.safeParse(req.body);
 
     if (!result.success) {
-      return res.status(400).json({ errors: result.error.issues });
+      return res.status(400).json(validationError(result.error.issues));
     }
 
     await prisma.comment.update({ where: { id: commentId as string }, data: result.data });
@@ -89,9 +87,8 @@ export async function updateComment(req: Request, res: Response) {
     return res.status(200).json({ message: 'Comment updated successfully' });
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json(apiError('internal_error', error.message));
     }
-    return res.status(500).json({ message: 'Unknown error ocurred' });
   }
 }
 
@@ -101,7 +98,7 @@ export async function deleteComment(req: Request, res: Response) {
     const { commentId } = req.params;
 
     if (!userId) {
-      return res.status(401).json(apiError('unauthorized', 'Unauthorized'));
+      return res.status(401).json(apiError('unauthorized', 'Authentication required'));
     }
 
     const comment: Comment | null = await prisma.comment.findUnique({
@@ -121,8 +118,7 @@ export async function deleteComment(req: Request, res: Response) {
     return res.status(200).json({ message: 'Comment deleted successfully' });
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json(apiError('internal_error', error.message));
     }
-    return res.status(500).json({ message: 'Unknown error ocurred' });
   }
 }

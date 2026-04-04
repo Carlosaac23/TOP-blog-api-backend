@@ -2,8 +2,6 @@ import type { Request, Response } from 'express';
 
 import jwt, { type SignOptions } from 'jsonwebtoken';
 
-import type { AuthRole } from '../types/index.js';
-
 import { apiError, validationError } from '../helpers/errors.js';
 import { validateHashedPassword } from '../helpers/password.js';
 import { prisma } from '../lib/prisma.js';
@@ -17,30 +15,25 @@ export async function login(req: Request, res: Response) {
       return res.status(400).json(validationError(result.error.issues));
     }
 
-    const { identifier, password } = result.data;
+    const { identifier, password, role } = result.data;
 
-    const [user, writer] = await Promise.all([
-      prisma.user.findFirst({ where: { OR: [{ email: identifier }, { username: identifier }] } }),
-      prisma.writer.findFirst({ where: { OR: [{ email: identifier }, { username: identifier }] } }),
-    ]);
+    const account =
+      role === 'user'
+        ? await prisma.user.findFirst({
+            where: { OR: [{ email: identifier }, { username: identifier }] },
+          })
+        : await prisma.writer.findFirst({
+            where: { OR: [{ email: identifier }, { username: identifier }] },
+          });
 
-    const userPasswordOk = user ? await validateHashedPassword(password, user.password) : false;
-    const writerPasswordOk = writer
-      ? await validateHashedPassword(password, writer.password)
-      : false;
-
-    if (!userPasswordOk && !writerPasswordOk) {
+    if (!account) {
       return res.status(401).json(apiError('unauthorized', 'Invalid credentials'));
     }
 
-    if (userPasswordOk && writerPasswordOk) {
-      return res.status(409).json({
-        message: 'Ambiguous account: same identifier/password exists for user and writer',
-      });
+    const validPassword = await validateHashedPassword(password, account.password);
+    if (!validPassword) {
+      return res.status(401).json(apiError('unauthorized', 'Invalid credentials'));
     }
-
-    const account = userPasswordOk ? user : writer;
-    const role: AuthRole = userPasswordOk ? 'user' : 'writer';
 
     if (!process.env['JWT_SECRET']) {
       return res.status(500).json(apiError('internal_error', 'JWT secret is not configured'));
@@ -52,11 +45,7 @@ export async function login(req: Request, res: Response) {
 
     const token = jwt.sign(
       {
-        sub: account?.id,
-        name: `${account?.firstName} ${account?.lastName}`,
-        username: account?.username,
-        email: account?.email,
-        createdAt: account?.createdAt,
+        sub: account.id,
         role,
       },
       jwtSecret,
@@ -107,7 +96,7 @@ export async function getSubjectProfile(req: Request, res: Response) {
     }
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json(apiError('internal_error', error.message));
     }
     return res.status(500).json({ message: 'Unknown error ocurred' });
   }

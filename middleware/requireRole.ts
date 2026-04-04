@@ -9,11 +9,13 @@ export default function requireRole(...allowedRoles: AuthRole[]) {
     const role = req.user?.role;
 
     if (!role) {
-      return res.status(401).json(apiError('unauthorized', 'Unauthorized'));
+      return res.status(401).json(apiError('unauthorized', 'Authentication required'));
     }
 
     if (!allowedRoles.includes(role)) {
-      return res.status(403).json(apiError('forbidden', 'Forbidden'));
+      return res
+        .status(403)
+        .json(apiError('forbidden', 'You do not have permission to access this resource'));
     }
 
     next();
